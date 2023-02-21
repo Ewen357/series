@@ -1,13 +1,5 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
+{% extends 'base.html.twig' %}
+{% block body %}
 <h1>test !</h1>
 {# création de variable #}
 {% set name = "Ewen" %}
@@ -18,7 +10,48 @@
 {% set colors = ['red','purple','green','yellow'] %}
 
 {% for color in colors %}
-<div>{{ color }}</div>
+    <div style="background-color:{{ color }} ">{{ color }}</div>
+    {% if loop.first %}
+        <div>Premiere itération</div>
+    {% endif %}
+
+
+    {# index de l'élément #}
+    <div>index de l'élément courant : {{ loop.index }} / {{ loop.length }}</div>
+
+    {% if loop.last %}
+        <div>Dernière itération</div>
+    {% endif %}
+    {# si tableau est vide alors on passe dans le else #}
+
+{% else %}
+
+    <div> Pas d'éléments</div>
 {% endfor %}
+
+
+{# Manipulation d'objets #}
+
+{% set serie = {
+    title : "LOTR",
+    year : 2022,
+    platform : "Amazon"
+} %}
+
+<h2>titre de la série : {{ serie.title }} </h2>
+
+{# boucler sur un objet  #}
+
+{% for key, val in serie %}
+<div>{{ key }} : {{ val }}</div>
+{% endfor %}
+
+
+{# Les filtres Twig #}
+<div> {{ name | upper | lower | capitalize }} : {{ name | length }} lettres</div>
+<div> {{ colors | join ("-") }}</div>
+<div>{{ "now" | date ('Y-m-d') }}</div>
+{% endblock %}
+{% block title %}{{ parent() | Test }} {% endblock %}
 </body>
 </html>

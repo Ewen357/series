@@ -1,14 +1,8 @@
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-<h1>Welcome to series ! </h1>
+{% extends 'base.html.twig' %}
+{# Parent() permet de recuperer ce que contient le bloc de la base #}
+{% block title %}{{ parent()}} | home  {% endblock %}
 
-</body>
-</html>
+{# Si je redefinis le contenu, j'ecrase le contenu present dans la base #}
+{% block body %}
+    <h1>Welcome to Series !</h1>
+{% endblock %}
