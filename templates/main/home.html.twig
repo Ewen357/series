@@ -1,8 +1,24 @@
 {% extends 'base.html.twig' %}
-{# Parent() permet de recuperer ce que contient le bloc de la base #}
-{% block title %}{{ parent()}} | home  {% endblock %}
 
-{# Si je redefinis le contenu, j'ecrase le contenu present dans la base #}
+{# parent() permet de récupérer ce que contient le bloc de la base #}
+{% block title %} {{ parent() }} | Home {% endblock %}
+
+{# si je redéfinis le contenu, j'écrase le contenu présent dans la base #}
 {% block body %}
-    <h1>Welcome to Series !</h1>
+    <h1>Welcome to series !</h1>
+
+    <div>{{ name }}</div>
+    {# supprime complètement le code HTML #}
+    <div> {{ name | striptags }}</div>
+    {# désactiver la protection XSS #}
+    <div>{{ name | raw }}</div>
+
+    <h2>Serie's detail</h2>
+
+    <ul>
+        {% for key, val in serie %}
+            <li>{{ key }} : {{ val }}</li>
+        {% endfor %}
+    </ul>
+
 {% endblock %}

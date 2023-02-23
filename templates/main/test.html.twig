@@ -1,57 +1,61 @@
 {% extends 'base.html.twig' %}
+
 {% block body %}
-<h1>test !</h1>
-{# création de variable #}
-{% set name = "Ewen" %}
-<h2>Hello {{ name ~ " " ~ name }} !</h2>
+    <h1>Test !</h1>
 
-{# tableau #}
+    {# création de variable #}
+    {% set name = "Sylvain" %}
+    {# ~ est le symbole de concaténation #}
+    <h2>Hello {{ name ~ " " ~ name }} !</h2>
+    <h2>Hello {{ name }} {{ name }}!</h2>
 
-{% set colors = ['red','purple','green','yellow'] %}
+    {# création d'un tableau #}
+    {% set colors = ['red', 'purple', 'green', 'yellow'] %}
 
-{% for color in colors %}
-    <div style="background-color:{{ color }} ">{{ color }}</div>
-    {% if loop.first %}
-        <div>Premiere itération</div>
-    {% endif %}
+    {# boucler sur un tableau #}
+    {% for color in colors %}
+        <div style="background-color: {{ color }}">{{ color }}</div>
+        {# usage de loop variable créé par for #}
+        {% if loop.first %}
+            <div>Première itération</div>
+        {% endif %}
+
+        {# index de l'élément #}
+        <div>index de l'élément courant : {{ loop.index }} / {{ loop.length }}</div>
+
+        {% if loop.last %}
+            <div>Dernière itération</div>
+        {% endif %}
+
+        {# si tableau est vide alors on passe dans le else #}
+    {% else %}
+        <div>Pas d'éléments</div>
+    {% endfor %}
+
+    {# manipulation d'objet #}
+
+    {% set serie =
+        {
+            title : "LOTR",
+            year : 2022,
+            platform : "Amazon"
+        }
+    %}
+
+    <h2>Titre de la série : {{ serie.title }}</h2>
+
+    {# boucler sur un objet #}
+    {% for key, val in serie %}
+        <div>{{ key }} : {{ val }}</div>
+    {% endfor %}
 
 
-    {# index de l'élément #}
-    <div>index de l'élément courant : {{ loop.index }} / {{ loop.length }}</div>
+    {# les filtres #}
+    {# le chainage est possible #}
+    <div>{{ name | upper | lower | capitalize }} : {{ name | length }} lettres</div>
+    <div>{{ colors | join("-")  }}</div>
+    <div> {{ "now" | date('Y-m-d') }}</div>
 
-    {% if loop.last %}
-        <div>Dernière itération</div>
-    {% endif %}
-    {# si tableau est vide alors on passe dans le else #}
-
-{% else %}
-
-    <div> Pas d'éléments</div>
-{% endfor %}
-
-
-{# Manipulation d'objets #}
-
-{% set serie = {
-    title : "LOTR",
-    year : 2022,
-    platform : "Amazon"
-} %}
-
-<h2>titre de la série : {{ serie.title }} </h2>
-
-{# boucler sur un objet  #}
-
-{% for key, val in serie %}
-<div>{{ key }} : {{ val }}</div>
-{% endfor %}
-
-
-{# Les filtres Twig #}
-<div> {{ name | upper | lower | capitalize }} : {{ name | length }} lettres</div>
-<div> {{ colors | join ("-") }}</div>
-<div>{{ "now" | date ('Y-m-d') }}</div>
 {% endblock %}
-{% block title %}{{ parent() | Test }} {% endblock %}
-</body>
-</html>
+
+{% block title %} {{ parent() }} | Test{% endblock %}
