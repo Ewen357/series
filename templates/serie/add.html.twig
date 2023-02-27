@@ -6,4 +6,14 @@
 
 {% block body %}
     <h2>Add a new serie !</h2>
+
+    {{ form_start(serieForm) }}
+    <div class="machin">
+        {{ form_label(serieForm.name) }}
+        {{ form_widget(serieForm.name) }}
+        {{ form_errors(serieForm.name) }}
+    </div>
+    {{ form_rest(serieForm) }}
+    <button>Add serie !</button>
+    {{ form_end(serieForm) }}
 {% endblock %}

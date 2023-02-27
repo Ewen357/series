@@ -5,8 +5,10 @@ namespace App\Entity;
 use App\Repository\SerieRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SerieRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Serie
 {
     #[ORM\Id]
@@ -15,15 +17,20 @@ class Serie
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Please provide a name for the serie !")]
+    #[Assert\Length(min: 2,max: 255,minMessage: "Minimum {{limit}} characters please !",maxMessage: "Maximum {{Limit}} characters please !")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(max: 3000,maxMessage: "Maximum {{limit}} characters please !")]
     private ?string $overview = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\Choice(["canceled","ended","returning"])]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 1)]
+    #[Assert\Range(notInRangeMessage: "Vote out of bound !",min: 0,max: 10)]
     private ?string $vote = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2)]
@@ -33,9 +40,14 @@ class Serie
     private ?string $genres = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "Please provide a date")]
+    #[Assert\LessThanOrEqual(propertyPath: "lastAirDate", message: "This value must be less than last air date")]
+
     private ?\DateTimeInterface $firstAirDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "Please provide a date")]
+    #[Assert\GreaterThanOrEqual(propertyPath: "firstAirDate", message: "This date must be greater than first air date")]
     private ?\DateTimeInterface $lastAirDate = null;
 
     #[ORM\Column(length: 255)]
@@ -48,9 +60,11 @@ class Serie
     private ?int $tmdbId = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: "Please provide a date")]
     private ?\DateTimeInterface $dateCreated = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Assert\NotBlank(message: "Please provide a date")]
     private ?\DateTimeInterface $dateModified = null;
 
     public function getId(): ?int
@@ -135,7 +149,7 @@ class Serie
         return $this->firstAirDate;
     }
 
-    public function setFirstAirDate(\DateTimeInterface $firstAirDate): self
+    public function setFirstAirDate(?\DateTimeInterface $firstAirDate): self
     {
         $this->firstAirDate = $firstAirDate;
 
@@ -147,7 +161,7 @@ class Serie
         return $this->lastAirDate;
     }
 
-    public function setLastAirDate(\DateTimeInterface $lastAirDate): self
+    public function setLastAirDate(?\DateTimeInterface $lastAirDate): self
     {
         $this->lastAirDate = $lastAirDate;
 
@@ -212,5 +226,10 @@ class Serie
         $this->dateModified = $dateModified;
 
         return $this;
+    }
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->setDateCreated(new \DateTime());
     }
 }
