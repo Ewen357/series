@@ -6,6 +6,7 @@ use App\Entity\Serie;
 use App\Form\SerieType;
 use App\Repository\SerieRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,20 +16,30 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/serie', name: 'serie_')]
 class SerieController extends AbstractController
 {
-    #[Route('/list', name: 'list', methods: "GET")]
-    public function list(SerieRepository $serieRepository): Response
+    #[Route('/list/{page}', name: 'list',requirements: ['page'=> '\d+'],methods: "GET")]
+    public function list(SerieRepository $serieRepository, int $page = 1): Response
     {
-//        $series = $serieRepository -> findAll();
-//        dump($series);
+        //$series = $serieRepository -> findAll();
+        //dump($series);
         $series = $serieRepository->findBy(['status' => 'ended'],['popularity' => 'DESC']);
-//        dump($series);
+        //dump($series);
         //$series = $serieRepository->findBy([],["vote" =>"DESC"],300);
         //ou en plus rapide
         //$series = $serieRepository ->findByStatus("ended");
-    $series = $serieRepository->findBestSeries();
 
-        //TODO Récupérer la liste des series en BDD
-        return $this->render('serie/list.html.twig', ['series' => $series]);
+        //nombre de series dans ma table
+        $nbSerieMax = $serieRepository->count([]);
+        $maxPage =ceil($nbSerieMax / $serieRepository::SERIE_LIMIT );
+
+        if($page >= 1 && $page <= $maxPage ){
+            $series = $serieRepository->findBestSeries($page);
+
+        }else throw $this->createNotFoundException("Page not found !");
+
+        dump($series);
+
+
+        return $this->render('serie/list.html.twig', ['series' => $series,'currentPage' => $page,'maxPage'=>$maxPage]);
 
     }
 
@@ -81,8 +92,17 @@ class SerieController extends AbstractController
         $serieForm ->handleRequest($request);
 
         if ($serieForm->isSubmitted()&& $serieForm ->isValid()){
+            /**
+             * @var UploadedFile $file
+             */
+            $file =$serieForm->get('poster')->getData();
+            $newFileName = $serie->getName() ."-".uniqid()."-".$file->guessExtension();
+            $file->move('img/posters/series', $newFileName);
+            $serie->setPoster($newFileName);
+
+            dd($file);
             $serieRepository->save($serie,true);
-            $this->addFlash("success","Serie Added !!");
+            $this->addFlash("warning","Serie Added !!");
             return $this ->redirectToRoute('serie_show',['id'=> $serie->getId()]);
         }
 
@@ -92,5 +112,16 @@ class SerieController extends AbstractController
         return $this->render('serie/add.html.twig',['serieForm'=>$serieForm->createView()]);
     }
 
+    #[Route('/remove/{id}', name: 'remove')]
+    public function remove(int $id,SerieRepository $serieRepository){
+        $serie = $serieRepository ->find($id);
+        if ($serie) {
+            $serieRepository->remove($serie, true);
+            $this->addFlash('success','Serie deleted !');
+        }else{
+            throw $this ->createNotFoundException("this serie can't be deleted");
+        }
+        return $this->redirectToRoute('serie_list');
+    }
 
 }

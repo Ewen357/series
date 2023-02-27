@@ -51,7 +51,7 @@ class SerieType extends AbstractType
                 'widget' =>'single_text'
             ])
             ->add('backdrop')
-            ->add('poster')
+            ->add('poster',Filetype::class, ['mapped' => false])
             ->add('tmdbId');
 
     }
